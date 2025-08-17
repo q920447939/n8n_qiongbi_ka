@@ -1,10 +1,10 @@
 # N8N 工作流 实现自动抓取流量卡数据
 
-基于`N8N`工作流+`LLM大模型`定时抓取流量卡平台手机卡套餐信息进行聚合展示。
+基于`N8N`工作流+`LLM大模型`定时抓取流量卡平台手机卡套餐信息进行聚合展示(包含**返佣**)。
 
 采用`docker`轻量级部署
 
-部署效果图
+部署效果图如下：
 
 ![image-20250817144015717](./img/Snipaste_2025-08-11_11-41-05.jpg)
 
@@ -26,9 +26,8 @@
 
 ### 环境要求
 
-- Python 3.12+
-- MySQL 8.0+
-- Docker & Docker Compose (可选)
+- `Linux/Unix` 操作系统
+- `Docker `
 
 ### 部署教程
 
@@ -37,7 +36,7 @@
 git clone https://github.com/your-username/n8n_qiongbi_ka.git
 ```
 
-2. 将项目上传到`Linux`服务器,并进入`n8n_qiongbi_ka` 目录
+2. 将项目上传到`Linux/Unix`服务器,并进入`n8n_qiongbi_ka` 目录
 3. 修改配置文件(`.env.docker`) 配置项(**强烈建议修改**)
 ```bash
 DB_USERNAME=root #mysql 用户名
@@ -52,13 +51,15 @@ API_TOKEN_KEY=2240DA80B95849C1BE1FFD31002C8A #API请求密钥
       MYSQL_ROOT_PASSWORD: 123456 #如果第3步修改了此项,那么这里也需要修改
 ```
 
+
+
 5. 赋予一键安装脚本执行权限
 ```bash
 chmod +x deploy.sh
 
 ```
 
-5. **编译/运行项目**
+6. **编译/运行项目**
 ```bash
 ./deploy.sh
 ```
@@ -81,11 +82,11 @@ chmod +x deploy.sh
 
 ### 开发流程
 
-1. Fork 项目
+1. `Fork `项目
 2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
 3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
 4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 创建 Pull Request
+5. 创建 `Pull Request`
 
 ## 📄 许可证
 

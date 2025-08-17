@@ -43,4 +43,3 @@ Thumbs.db
 /.env.prod
 .env.docker
 uv.lock
-.dockerignore
