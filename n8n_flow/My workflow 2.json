@@ -1,0 +1,356 @@
+{
+  "name": "My workflow 3",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "const dataArray = $input.all();\n\n// 构建表格格式\nlet tableData = [];\ndataArray.forEach(item => {\n  var json_ = item['json']\n  tableData.push(\n\t{\n\t\t\"source\":\"amiao\",\n\t\t\"id\":json_.id,\n\t\t\"detail\":'[产品名:'+json_.goodName+']' + \",\" + '[备注:'+json_.sellingPointTag + ']',\n\t\t\"age_range\":json_.limitAgeMin + \"-\" + json_.limitAgeMax,\n\t\t\"ka_origin\":\"\",\n\t\t\"disable_area\":json_.limitAddrCode,\n\t\t\"rebate_money\":json_.childCommission\n\t}\n)\n});\nreturn tableData;\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        16
+      ],
+      "id": "66f3b987-62ec-4e27-b509-4b1e039fac57",
+      "name": "抽取数据-替换为表格 "
+    },
+    {
+      "parameters": {
+        "jsCode": "let jsonArray = $input.all();\nconsole.log(\"jsonArray is\",jsonArray)\n // 定义表头与JSON属性的映射关系\n    const columnMappings = [\n        { key: 'source', header: '系统来源' },\n        { key: 'id', header: 'ID' },\n        { key: 'productName', header: '卡种名称' },\n        { key: 'yys', header: '运营商' },\n        { key: 'monthly_rent', header: '月租' },\n        { key: 'general_flow', header: '流量' },\n        { key: 'detail', header: '详细信息' },\n        { key: 'age_range', header: '办理年龄段' },\n        { key: 'ka_origin', header: '可发货地区' },\n        { key: 'disable_area', header: '禁发城市' },\n        { key: 'rebate_money', header: '返佣金额' }\n    ];\n\n    // 生成表头\n    const headerRow = columnMappings.map(col => col.header).join(' | ');\n    const separator = columnMappings.map(() => '---').join(' | ');\n\n    // 生成表格内容\n    const tableRows = jsonArray.map(item => {\n      let json_ = item.json\n        return columnMappings.map(col => {\n            // 处理嵌套属性\n            if (col.key.includes('.')) {\n                const keys = col.key.split('.');\n                return keys.reduce((obj, key) => obj && obj[key], json_) || '';\n            }\n            return json_[col.key] || '';\n        }).join(' | ');\n\n    });\n\nconsole.log(\"tableRows\",tableRows)\n// 组合表格的所有部分\n    let result = headerRow + '\\n' + separator;\n    for (let i = 0; i < tableRows.length; i++) {\n        result += '\\n' + tableRows[i];\n    }\nconsole.log(\"result\",result)\n    return {\n      \"result\":result\n    };\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1168,
+        48
+      ],
+      "id": "2cf78ee0-0b0a-4ee5-8bfb-7a7f0c7080d4",
+      "name": "阿喵-转为AI表格"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=你是一个极有经验的手机卡挑选师，你非常擅长在数据中找出最具有优性价比的手机卡\n如果有一款手机卡套餐流量多(全国流量优先),通话时间长,费用低,并且返佣金额还高,那么这一款套餐的评分(每一项占比都很高)就会评分很高\n#注:评分的总分是100分,给出的评分是整数\n\n### **任务目标**\n\n给出的手机卡套餐列表进行总结，并通过分析选出当前手机卡套餐列表中最具有性价比的TOP20手机卡套餐。\n\n### **输入数据**\n{{ $json.result }}\n\n\n\n### **输出格式要求**\n\n1. **仅输出 JSON 数组**，包含按总分从高到低排序的套餐。\n2. **严格符合以下格式**：\n\n   ```json\n   [\n     {\n\t\t\"source\": \"\",  #系统来源\n\t\t\"id\": \"\",#id\n\t  },\n      {},\n     ...\n   ]\n   ```\n### **执行约束**\n\n- **禁止添加任何额外说明**（如计算过程、分析理由等）。\n- **若无法生成有效 JSON，请直接报错**。",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        48
+      ],
+      "id": "585c1fde-888f-428a-96d4-c3df315278b9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatDeepSeek",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        240
+      ],
+      "id": "3fd67bde-b80f-4bf0-a9ff-bc2002df6418",
+      "name": "DeepSeek Chat Model5"
+    },
+    {
+      "parameters": {
+        "jsCode": "var jsonArray = JSON.parse(\n  $input.first().json.output\n    .replace(/```json/g, '')\n    .replace(/```/g, '')\n    .replace(/\\n/g, '')\n);\nvar resultList = [];\njsonArray.map(item=>{\n  var source = item['source']\n  if (source === \"kaduoduo\") {\n    resultList.push($('阿喵-最终结果').all().find(k=>k.json.id.toString() === item['id']).json)\n  }\n  \n});\n\n\nreturn {\n  \"data\":resultList\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2048,
+        48
+      ],
+      "id": "2897c033-1bc7-4b83-bcc4-e47c28efda01",
+      "name": "合并-处理数据AI输出"
+    },
+    {
+      "parameters": {
+        "fromEmail": "your email",
+        "toEmail": "your email",
+        "subject": "收集到的数据",
+        "html": "=<!DOCTYPE html>\n<html>\n<head>\n    <meta charset=\"UTF-8\">\n    <title>手机卡数据统计报告</title>\n    <style>\n        body {\n            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;\n            line-height: 1.6;\n            color: #333;\n            max-width: 600px;\n            margin: 0 auto;\n            padding: 20px;\n        }\n        .container {\n            background-color: #ffffff;\n            border-radius: 8px;\n            box-shadow: 0 2px 10px rgba(0,0,0,0.1);\n            padding: 25px;\n        }\n        .header {\n            text-align: center;\n            margin-bottom: 25px;\n        }\n        .header h1 {\n            color: #007BFF;\n            margin: 0;\n            font-size: 24px;\n        }\n        .status {\n            background-color: #E8F5E9;\n            color: #2E7D32;\n            padding: 12px;\n            border-radius: 4px;\n            margin-bottom: 25px;\n            text-align: center;\n            font-weight: 600;\n        }\n        .data-section {\n            margin-bottom: 20px;\n        }\n        .data-section h2 {\n            color: #333;\n            font-size: 18px;\n            margin-top: 0;\n            margin-bottom: 15px;\n            border-bottom: 1px solid #eee;\n            padding-bottom: 8px;\n        }\n        .data-table {\n            width: 100%;\n            border-collapse: collapse;\n        }\n        .data-table th, .data-table td {\n            padding: 10px 15px;\n            text-align: left;\n            border-bottom: 1px solid #eee;\n        }\n        .data-table th {\n            background-color: #f8f9fa;\n            color: #555;\n            font-weight: 600;\n        }\n        .footer {\n            margin-top: 25px;\n            text-align: center;\n            color: #777;\n            font-size: 14px;\n        }\n    </style>\n</head>\n<body>\n    <div class=\"container\">\n        <div class=\"header\">\n            <h1>手机卡数据统计报告</h1>\n        </div>\n        \n        <div class=\"status\">\n            最终存储的结果：成功保存 {{ $json.total }} 条手机卡数据\n        </div>\n        \n        <div class=\"data-section\">\n            <h2>各平台数据统计</h2>\n            <table class=\"data-table\">\n                <tr>\n                    <th>平台名称</th>\n                    <th>数据条数</th>\n                </tr>\n                <tr>\n                    <td>阿喵平台</td>\n                    <td>{{ $('amiao-最终结果').all().length }}</td>\n                </tr>\n            </table>\n        </div>\n        \n        <div class=\"footer\">\n            <p>此报告由系统自动生成</p>\n        </div>\n    </div>\n</body>\n</html>\n    ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [
+        2736,
+        64
+      ],
+      "id": "980b3e2e-98cb-4df3-9091-1af746d28532",
+      "name": "Send email",
+      "webhookId": "75e6eb13-66ac-4736-ae3f-145f3bdeb9c3"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "a15c367c-193b-4ff3-b89d-d085a4ded4e6",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawData = $input.first().json;\nreturn rawData.data.list\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        656,
+        16
+      ],
+      "id": "9d2cdc32-14d0-4c1e-bf36-c1f6fa58cdf3",
+      "name": "阿喵-最终结果"
+    },
+    {
+      "parameters": {
+        "url": "https://k.amiao.co/admin-api/infra/goods/page",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pageNo",
+              "value": "1"
+            },
+            {
+              "name": "pageSize",
+              "value": "100"
+            },
+            {
+              "name": "goodStatus",
+              "value": "1"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json, text/plain, */*"
+            },
+            {
+              "name": "accept-language",
+              "value": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6"
+            },
+            {
+              "name": "authorization",
+              "value": "=Bearer {{ $json.data.accessToken }}"
+            },
+            {
+              "name": "cache-control",
+              "value": "no-cache"
+            },
+            {
+              "name": "pragma",
+              "value": "no-cache"
+            },
+            {
+              "name": "priority",
+              "value": "u=1, i"
+            },
+            {
+              "name": "referer",
+              "value": "https://k.amiao.co/goods/goods"
+            },
+            {
+              "name": "sec-ch-ua",
+              "value": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Microsoft Edge\";v=\"138\""
+            },
+            {
+              "name": "sec-ch-ua-mobile",
+              "value": "?0"
+            },
+            {
+              "name": "sec-ch-ua-platform",
+              "value": "\"Windows\""
+            },
+            {
+              "name": "sec-fetch-dest",
+              "value": "empty"
+            },
+            {
+              "name": "sec-fetch-mode",
+              "value": "cors"
+            },
+            {
+              "name": "sec-fetch-site",
+              "value": "same-origin"
+            },
+            {
+              "name": "tenant-id"
+            },
+            {
+              "name": "user-agent",
+              "value": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36 Edg/138.0.0.0"
+            },
+            {
+              "name": "cookie"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        384,
+        16
+      ],
+      "id": "2e5549cf-1856-4a06-8bc6-d6e282568602",
+      "name": "阿喵手机卡-查询数据"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=http://your_ip:8100/api/mobile-cards ",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "API-TOKEN-KEY"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.data }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2400,
+        48
+      ],
+      "id": "bfdaa134-52ec-4925-b9c9-2741758839e9",
+      "name": "保存数据"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "抽取数据-替换为表格 ": {
+      "main": [
+        [
+          {
+            "node": "阿喵-转为AI表格",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "阿喵-转为AI表格": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "合并-处理数据AI输出",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DeepSeek Chat Model5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "合并-处理数据AI输出": {
+      "main": [
+        [
+          {
+            "node": "保存数据",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "阿喵手机卡-查询数据",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "阿喵-最终结果": {
+      "main": [
+        [
+          {
+            "node": "抽取数据-替换为表格 ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "阿喵手机卡-查询数据": {
+      "main": [
+        [
+          {
+            "node": "阿喵-最终结果",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "保存数据": {
+      "main": [
+        [
+          {
+            "node": "Send email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "081c714a-ccfb-4650-a592-c900d6536d5c",
+  "meta": {
+    "instanceId": "9f7245a2c1e966ea9f4e274f1454512918b80441d6bc00cb9abf5e03b20b75e8"
+  },
+  "id": "UZ1GfSlv2YxsTT3W",
+  "tags": []
+}

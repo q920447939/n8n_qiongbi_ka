@@ -68,7 +68,8 @@ chmod +x deploy.sh
 7. 检查结果
 打开浏览器,访问 `http://your_ip:80/card`
 
-
+7. `N8N`工作流部署
+请看 [教程](N8N_AUTO_FLOW.md)
 
 ## 🤝 贡献指南
 
