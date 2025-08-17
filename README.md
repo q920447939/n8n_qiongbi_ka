@@ -98,12 +98,6 @@ chmod +x deploy.sh
 
 感谢所有为这个项目做出贡献的开发者！
 
-## 📞 联系我们
-
-- **项目主页**: https://github.com/your-username/n8n_qiongbi_ka
-- **问题反馈**: https://github.com/your-username/n8n_qiongbi_ka/issues
-- **功能建议**: https://github.com/your-username/n8n_qiongbi_ka/discussions
-
 
 
 ---
