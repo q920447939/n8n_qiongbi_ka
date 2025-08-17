@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # MySQL 8.0 数据库服务
+  n8n_mysql:
+    image: mysql:8.0
+    container_name: n8n_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: n8n_mobile_cards
+      TZ: Asia/Shanghai
+    command: >
+      --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone='+08:00' --sql-mode='STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO'
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
+    networks:
+      - n8n_network
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456" ]
+      timeout: 20s
+      retries: 10
+
+  # Nginx 反向代理服务
+  n8n_nginx:
+    image: nginx:alpine
+    container_name: n8n_nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      # Linux/Mac 路径
+      - /home/n8n_qiongbika/nginx_config:/etc/nginx/conf.d
+      # Windows 路径 (注释掉上面的行，取消注释下面的行)
+      # - C:/n8n_qiongbika/nginx_config:/etc/nginx/conf.d
+      - ./static:/mnt/static:ro
+    networks:
+      - n8n_network
+    depends_on:
+      - n8n_app
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/" ]
+      timeout: 10s
+      retries: 3
+
+  # Python 应用服务
+  n8n_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: n8n_app
+    restart: always
+    ports:
+      - "8100:8100"
+    volumes:
+      # Linux/Mac 路径
+      - /home/n8n_qiongbika/code:/app
+    networks:
+      - n8n_network
+    depends_on:
+      n8n_mysql:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8100/health" ]
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  n8n_network:
+    driver: bridge
+    name: n8n_network
+
+volumes:
+  mysql_data:
+    driver: local

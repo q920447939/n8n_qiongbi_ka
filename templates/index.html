@@ -1,0 +1,114 @@
+{# 导入宏定义 #}
+{% from 'macros.html' import render_cards_container %}
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>低价流量卡聚合平台-优质流量卡推荐 - 性价比最高的手机卡</title>
+
+    <link rel="stylesheet" href="{{ domain }}/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- 引入jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>低价流量卡聚合平台-优质流量卡精选</h1>
+            <p class="subtitle">精选全网性价比最高的手机卡套餐(官网可查套餐)</p>
+            <p>抖音、小红书等平台不可查套餐均为非法套餐,注意甄别!防止被骗</p>
+
+
+            <!-- 平台统计信息区域 -->
+            <div style="display: flex;justify-content: space-between;align-items: center;padding-top: 9px;">
+                <div class="stat-content">
+                    <span class="stat-label">累计访问</span>
+                    <span class="stat-value">
+                        <strong class="stat-number" id="visit-count">{{ total_visits }}</strong> 次
+                    </span>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-label">今日下单数</span>
+                    <span class="stat-value">
+                        <strong class="stat-number" id="daily_orders">{{ daily_orders }}</strong> 次
+                    </span>
+                </div>
+                <div class="stat-content">
+                    <span class="stat-label">更新时间</span>
+                    <span class="stat-value">{{ update_time }}</span>
+                </div>
+            </div>
+
+        </header>
+
+        <!-- 标签页导航 -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="best-value">性价比</button>
+            <button class="tab-btn" data-tab="china-mobile">中国移动</button>
+            <button class="tab-btn" data-tab="china-unicom">中国联通</button>
+            <button class="tab-btn" data-tab="china-telecom">中国电信</button>
+            <button class="tab-btn" data-tab="china-broadcast">中国广电</button>
+        </div>
+
+        <!-- 标签页内容 -->
+        <div class="tab-content active" id="best-value">
+            <h2>性价比TOP{{ total_count }} <span class="highlight">精选推荐</span></h2>
+            {{ render_cards_container(all_data, domain) }}
+        </div>
+
+        <div class="tab-content" id="china-mobile">
+            <h2>中国移动 <span class="highlight">精选套餐</span></h2>
+            {{ render_cards_container(yidong_data, domain) }}
+        </div>
+
+        <div class="tab-content" id="china-unicom">
+            <h2>中国联通 <span class="highlight">精选套餐</span></h2>
+            {{ render_cards_container(union_data, domain) }}
+        </div>
+
+        <div class="tab-content" id="china-telecom">
+            <h2>中国电信 <span class="highlight">精选套餐</span></h2>
+            {{ render_cards_container(telecom_data, domain) }}
+        </div>
+
+        <div class="tab-content" id="china-broadcast">
+            <h2>中国广电 <span class="highlight">精选套餐</span></h2>
+            {{ render_cards_container(broadcast_data, domain) }}
+        </div>
+    </div>
+
+    <!-- 联系区域 -->
+    <div class="contact-container">
+        <button class="feedback-btn" id="feedback-btn">
+            <i class="fas fa-comment-alt"></i>
+            <span>交流/反馈</span>
+        </button>
+    </div>
+
+    <!-- 立即办理模态框 -->
+    <div id="order-modal" class="modal">
+        <div class="modal-content order-modal-content">
+            <span class="close" id="order-close">&times;</span>
+            <div class="order-modal-body">
+                <h2>选择办理方式</h2>
+                <div class="order-buttons-container" id="order-buttons-container">
+                    <!-- 按钮将通过JavaScript动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 成功提示 -->
+    <div id="success-toast" class="toast">
+        <i class="fas fa-check-circle"></i>
+        <span>操作成功！</span>
+    </div>
+
+    <script src="{{ domain }}/script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,94 @@
+{#
+宏定义文件 - 用于渲染手机套餐卡片
+作用：将重复的卡片渲染逻辑提取为可复用的宏，提升代码可维护性
+#}
+
+{# 渲染单个卡片的宏 #}
+{% macro render_card(item, domain) %}
+<div class="card" t-id="{{ item.card_id }}" t-source="{{ item.source }}">
+    {% if item.rebate_money and item.rebate_money|int > 0 %}
+    <div class="rebate-tag rebate-corner">
+        <i class="fas fa-gift"></i>
+        <span>返{{ item.rebate_money|int }}元</span>
+    </div>
+    {% endif %}
+    <div class="card-main">
+        <div class="operator-header">
+            <div class="operator">
+                <img src="{{ domain }}/assets/images/{% if '移动' in item.yys %}china-mobile.svg{% elif '联通' in item.yys %}china-unicom.svg{% elif '电信' in item.yys %}china-telecom.svg{% elif '广电' in item.yys %}china-broadcast.svg{% else %}default-operator.svg{% endif %}"
+                    alt="{{ item.yys }}" class="operator-logo">
+                <span
+                    class="operator-tag {% if '移动' in item.yys %}mobile{% elif '联通' in item.yys %}unicom{% elif '电信' in item.yys %}telecom{% elif '广电' in item.yys %}broadcast{% endif %}">{{
+                    item.yys.replace('中国', '') }}</span>
+            </div>
+            <!-- <div class="recommendation-score">
+                <div class="stars-container">
+                    {% set star_count = (item.point / 20)|int %}
+                    {% set half_star = (item.point % 20) >= 10 %}
+                    {% for i in range(5) %}
+                    {% if i < star_count %} <i class="fas fa-star"></i>
+                        {% elif half_star and i == star_count %}
+                        <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                        <i class="far fa-star"></i>
+                        {% endif %}
+                        {% endfor %}
+                </div>
+            </div> -->
+        </div>
+        <div class="card-name">{{ item.product_name }}</div>
+        <div class="price">
+            <span class="currency">¥</span>
+            <span
+                class="amount {% if item.monthly_rent|string|length > 8 %}very-long-text{% elif item.monthly_rent|string|length > 5 %}long-text{% endif %}">
+                {{ item.monthly_rent if '元' in item.monthly_rent else item.monthly_rent + '元/月' }}
+            </span>
+        </div>
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-wifi"></i>
+                <span>{{ item.general_flow }}</span>
+            </div>
+            <div class="feature">
+                <i class="fas fa-phone-alt"></i>
+                <span>{{ item.call_times or '无'}}</span>
+            </div>
+        </div>
+    </div>
+    <div class="card-details">
+        <p>{{ item.top_detail or '高性价比手机卡，流量充足，通话时长丰富，适合各类用户使用。' }}</p>
+
+        {# 信息标签区域 - 重新设计的信息展示区域 #}
+        <div class="info-tags">
+            <div class="info-tag">
+                <i class="fas fa-user-friends"></i>
+                <span>{{ item.age_range if '岁' in item.age_range else item.age_range + '岁' }}</span>
+            </div>
+            <div class="info-tag" style="
+            width: max-content;
+        ">
+                <img src="{{ domain }}/assets/images/ka_origin.svg" style="width: 16px; height: 16px;" alt="归属地"
+                    class="info-icon">
+                <span>归属地</span>
+                <span>{{ item.ka_origin or '办理地'}}</span>
+            </div>
+        </div>
+
+        <div class="tag hot">热门套餐</div>
+        <div class="btn-container">
+            <a href="#" class="btn-order" data-id="{{ item.id }}">
+                <span>查看详情</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endmacro %}
+
+{# 渲染卡片容器的宏 - 接受数据列表并渲染所有卡片 #}
+{% macro render_cards_container(data_list, domain) %}
+<div class="cards-container">
+    {% for item in data_list %}
+    {{ render_card(item, domain) }}
+    {% endfor %}
+</div>
+{% endmacro %}

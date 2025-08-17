@@ -1,0 +1,26 @@
+{
+  "operators": {
+    "172": {
+      "name": "172号卡",
+      "buttons": [
+        {
+          "text": "查看详情",
+          "template_url": "https://h5.lot-ml.com/h5orderEn/index?pudID={{ card_data_params['sn'] }}&userid={{ card_data_params['userSn'] }}",
+          "strategy": "jinja2_template",
+          "config": {}
+        }
+      ]
+    },
+    "amiao": {
+      "name": "阿喵",
+      "buttons": [
+        {
+          "text": "查看详情",
+          "template_url": "https://k.amiao.co/h5/gdetail?uc=ENtRDnzgshHJ&gi={{ card_data['card_id'] }}",
+          "strategy": "jinja2_template",
+          "config": {}
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "enabled": true,
+  "default_strategy": "database_log",
+  "async_logging": true,
+  "strategies": {
+    "database_log": {
+      "enabled": true,
+      "table_name": "user_event_logs",
+      "batch_size": 100
+    },
+    "file_log": {
+      "enabled": true,
+      "log_file": "logs/events.log",
+      "log_format": "json",
+      "max_file_size": 104857600
+    },
+    "remote_log": {
+      "enabled": false,
+      "endpoint_url": "",
+      "api_key": "",
+      "timeout": 30
+    }
+  },
+  "composite_strategies": [
+    {"name": "database_log", "config": {}},
+    {"name": "file_log", "config": {}}
+  ],
+  "allowed_event_types": ["api_call", "page_view", "user_action"],
+  "excluded_event_names": [],
+  "max_queue_size": 1000,
+  "flush_interval": 5
+}
