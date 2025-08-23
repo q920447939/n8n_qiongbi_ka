@@ -26,8 +26,7 @@ docker run -d --name n8n -p 5678:5678 -e N8N_SECURE_COOKIE=false   -v n8n_data:/
 2. 导入工作流(选择项目下`n8n_flow/My workflow 2.json`文件进行导入)
      ![image-20250817163026196](./img/n8n_flow/image-20250817163026196.png)
 
-  3. 注册流量卡平台账号 [飞书教程](https://ucnkpch5d597.feishu.cn/wiki/FGnxw9oOoiXpZDklW2tc5luvnGd?from=from_copylink)
-
+  3. 注册流量卡平台账号(未避免推广嫌疑,请大家自行寻找)
   4. 登录[电脑端后台](https://ka.dandanhou.net/agent/tixian),按下`F12`弹出开发者模式
 
   5. 获取请求接口数据(按图中的操作)
