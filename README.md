@@ -4,7 +4,9 @@
 
 采用`docker`轻量级部署
 
-[懒人地址](https://withmes.xin/card)
+[懒人地址(点击即可使用)](https://withmes.xin/card)
+
+
 部署效果图如下：
 
 ![image-20250817144015717](./img/Snipaste_2025-08-11_11-41-05.jpg)
